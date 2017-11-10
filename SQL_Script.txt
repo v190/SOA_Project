@@ -1,0 +1,280 @@
+--create database testdb;
+DROP TABLE IF EXISTS COMMENTS;
+DROP TABLE IF EXISTS INVOICE;
+DROP TABLE IF EXISTS PAYMENTS;
+DROP TABLE IF EXISTS TRANSACTIONS;
+DROP TABLE IF EXISTS ORDERS;
+DROP TABLE IF EXISTS EXPENSES;
+DROP TABLE IF EXISTS TRUCKS;
+DROP TABLE IF EXISTS PRICING;
+DROP TABLE IF EXISTS EMPLOYEES;
+DROP TABLE IF EXISTS LOCATIONS;
+DROP TABLE IF EXISTS CUSTOMERS;
+
+Create table soa.CUSTOMERS
+(
+	CustomerID varchar(30) not null PRIMARY KEY,
+    Title varchar(10),
+	BusinessName varchar(20),
+	Address varchar(20),
+	City Varchar(10),
+	State varchar(10),
+	PostalCode bigint,
+	Country varchar(10),
+	PhoneNumber varchar(15),
+	CellNumber varchar(15),
+	OtherNumber varchar(15),
+	FaxNumber varchar(15),
+	EmailAddress varchar(30),
+	Type varchar(10),
+	CompanyName varchar(20),
+	ContactName varchar(20),
+	AlternateContactName varchar(20),
+	DateEntered date
+);
+
+ALTER TABLE soa.CUSTOMERS ADD UNIQUE (PhoneNumber,EmailAddress,ContactName);
+
+
+Create table soa.LOCATIONS
+(
+	LocationID varchar(20) not null PRIMARY KEY,
+    CustomerID varchar(20),
+	LocName varchar(20),
+	LocationCode varchar(20),
+	isAuction boolean,
+	AddressStreet1 varchar(20),
+	AddressStreet2 varchar(20),
+	City varchar(20),
+	State varchar(20),
+	PostalCode bigint,
+	Region varchar(20),
+	LocationContactName varchar(20),
+	LocPhone varchar(20),
+	LocFaxNumber varchar(20),
+	LocEmail varchar(20),
+    CONSTRAINT fk_Location_Customer_id FOREIGN KEY (CustomerID) REFERENCES soa.CUSTOMERS(CustomerID)
+);
+
+
+create table soa.EMPLOYEES
+(
+	EmployeeID varchar(30) not null PRIMARY KEY,
+	FirstName varchar(30),
+	LastName varchar(30),
+	Email varchar(30),
+	Extension varchar(20),
+	HomePhone varchar(30),
+	CellPhone varchar(30),
+	JobTitle varchar(30),
+	SocialSecurityNumber varchar(30),
+    DateHired date,
+    Salary decimal(10,3),
+	DriverLicenseNumber varchar(30),
+	AddressLine1 varchar(30),
+    AddressLine2 varchar(30),
+	City varchar(30),
+	State varchar(30),
+	PostalCode varchar(30),
+	BirthDate date,
+	Notes varchar(30)
+);
+
+Create table soa.PRICING
+(
+	PriceID varchar(30) not null PRIMARY KEY,
+	Price decimal(8,2),
+	LocationIDFrom varchar(30),
+	LocationIDTo varchar(30),
+	LocationCodeFrom varchar(30),
+	LocationCodeTo varchar(30),
+	LocationNameFrom varchar(30),
+	LocationNameTo varchar(30),
+    CustomerID varchar(30),
+	CONSTRAINT fk_Pricing_Customer_id FOREIGN KEY (CustomerID) REFERENCES soa.CUSTOMERS(CustomerID)
+);
+
+create table TRUCKS
+(
+	TruckNo varchar(30) not null PRIMARY KEY,
+	Make varchar(30),
+	Year varchar(30),
+	Model varchar(30),
+	LicensePlateNo varchar(10),
+    EmployeeID varchar(30),
+	Color varchar(30),
+	VIN varchar(30),	
+	CONSTRAINT fk_Trucks_Employee_id FOREIGN KEY (EmployeeID) REFERENCES EMPLOYEES(EmployeeID)
+);
+
+
+
+
+create table soa.EXPENSES
+(
+	ExpenseID varchar(30) not null PRIMARY KEY,
+	EmployeeID varchar(30),
+	ExpenseType varchar(30),
+	PurposeofExpense varchar(30),
+	AmountSpent decimal(8,2),
+	Description varchar(30),
+	DatePurchased date,
+	DateSubmitted date,
+	AdvanceAmount decimal(8,2),
+	PaymentMethod varchar(30),
+	CONSTRAINT fk_Expense_Employee_id FOREIGN KEY (EmployeeID) REFERENCES soa.EMPLOYEES(EmployeeID)
+);
+
+
+
+
+create table soa.ORDERS
+(
+	OrderID varchar(30) not null PRIMARY KEY,
+	OrderDate date,
+	CustomerID varchar(30),
+	EmployeeID varchar(30),
+	TruckID varchar(30),
+	IsSpecial boolean,
+	PurchaseOrderNumber bigint,
+	OrderTotalAmount decimal(8,2),
+	CONSTRAINT fk_Orders_Customer_id FOREIGN KEY (CustomerID) REFERENCES soa.CUSTOMERS(CustomerID),
+	CONSTRAINT fk_Orders_Employee_id FOREIGN KEY (EmployeeID) REFERENCES soa.EMPLOYEES(EmployeeID),
+    CONSTRAINT fk_Orders_Truck_id FOREIGN KEY (TruckID) REFERENCES soa.TRUCKS(TruckNo)
+);
+
+
+
+create table soa.TRANSACTIONS
+(
+	TransactionID varchar(30) not null PRIMARY KEY,
+	OrderID varchar(30),
+	PriceID varchar(30),
+	TransactionDate date,
+	TransactionDescription varchar(30),
+	TransactionAmount decimal(8,2),
+	make varchar(30),
+	model varchar(30),
+	year varchar(30),
+	EmployeeID varchar(30),
+	TruckNo varchar(30),
+	discount decimal(8,2),
+	quantity int,
+	unitPrice decimal(8,2),
+	driverPrice decimal(8,2),
+	VIN varchar(30),
+	runNumber int,
+	special boolean,
+	rate decimal(8,2),
+	Surcharge decimal(8,2),
+	CONSTRAINT fk_Transactions_Order_id FOREIGN KEY (OrderID) REFERENCES soa.ORDERS(OrderID),
+	CONSTRAINT fk_Transactions_Price_id FOREIGN KEY (PriceID) REFERENCES soa.PRICING(PriceID),
+    CONSTRAINT fk_Transactions_Employee_id FOREIGN KEY (EmployeeID) REFERENCES soa.EMPLOYEES(EmployeeID),
+    CONSTRAINT fk_Transactions_Truck_id FOREIGN KEY (TruckNo) REFERENCES soa.TRUCKS(TruckNo)
+);
+
+
+
+create table soa.PAYMENTS
+(
+	PaymentID varchar(30) not null PRIMARY KEY,
+	OrderID varchar(30),
+	PaymentMethodID varchar(30),
+	PaymentAmount decimal(8,2),
+	PaymentDate date,
+	CheckNumber varchar(30),
+	CreditCard varchar(30),
+	CreditCardNumber varchar(30),
+	CreditCardHoldersName varchar(30),
+	CreditCardExpDate varchar(20),
+	CreditCardAuthorizedName int,
+	CONSTRAINT fk_Payments_Order_id FOREIGN KEY (OrderID) REFERENCES soa.ORDERS(OrderID)
+);
+
+
+
+Create table soa.INVOICE
+(
+	InvoiceID varchar(30) not null PRIMARY KEY,
+	OrderID varchar(30),
+	EmployeeID varchar(30),
+	CustomerID varchar(30),
+	Description varchar(30),
+	Price decimal(10,2),
+	Quantity int,
+	CONSTRAINT fk_Invoice_Order_id FOREIGN KEY (OrderID) REFERENCES soa.ORDERS(OrderID),
+	CONSTRAINT fk_Invoice_Customer_id FOREIGN KEY (CustomerID) REFERENCES soa.CUSTOMERS(CustomerID)
+);
+
+create table soa.COMMENTS
+(
+	CommentID varchar(30) not null PRIMARY KEY,
+	CustomerID varchar(30),
+	LocationID varchar(30),
+	TransactionID varchar(30),
+	CommentTime datetime,
+    CommentLine varchar(30),
+	CONSTRAINT fk_Comments_Customer_id FOREIGN KEY (CustomerID) REFERENCES soa.CUSTOMERS(CustomerID),
+	CONSTRAINT fk_Comments_Location_id FOREIGN KEY (LocationID) REFERENCES soa.LOCATIONS(LocationID),
+    CONSTRAINT fk_Comments_Transaction_id FOREIGN KEY (TransactionID) REFERENCES soa.TRANSACTIONS(TransactionID)
+);
+
+
+create table soa.login
+(
+	username varchar(30),
+    password varchar(30),
+    role varchar(30)
+);
+
+insert into soa.login values('C101','123','Customer');
+insert into soa.login values('C102','123','Customer');
+insert into soa.login values('C103','123','Customer');
+insert into soa.login values('C104','123','Customer');
+insert into soa.login values('admin','admin','Admin');
+
+insert into soa.customers values ('C101','Ms','Varshakr','Windsong Dr','Schaumburg','IL',60193,'USA','-2234','312-583-5656','312-583-5656','343-343-4251','vkaggere@hawk.iit.edu','nA','AISOft','simi','VKR','2017-12-25');
+insert into soa.customers values ('C102','Mr','Naresh','2901 S King DR','Chicago','IL',60616,'Cook','312-258-5656','312-258-5656','312-258-5656','343-151-4251','naresh@gmail.com','Buyer','BillSoft','Naresh','NKR','2017-04-25');
+insert into soa.customers values ('C103','Mr','Deepak','2951 S King DR','Chicago','IL',60616,'Cook','613-258-5656','613-258-5656','613-258-5656','343-151-6133','deepak@gmail.com','Buyer','TeckSoft','DeepalC','Deeps','2017-06-15');
+
+insert into soa.LOCATIONS values ('L101','C101','Chicago','312',1,'3001 Apt 1414','Prairie Shores','Chicago','IL',60616,'USA','Jim Walls','312-665-4758','312-665-4720','jim_walls@marx.com');
+insert into soa.LOCATIONS values ('L102','C102','Michigan','248',1,'34326 Apt# 141','Green Valley','Farmington','MI',48334,'SouthEast','DennisGreg','248-665-4759','248-665-4720','dennis_greg@marx.com');
+insert into soa.LOCATIONS values ('L103','C103','Chicago','312',1,'501E Apt# 560','Lake Meadows','Chicago','IL',60616,'NorthEastern','AlanWarner','312-664-4758','312-664-4200','alan_warner@marx.com');
+
+insert into soa.EMPLOYEES values ('E005','Smruti','Patel','','2343535435','123234353','-3343','ba','12133224','2017-03-21',12334.0,'131278787887','windsong drive','apt 202','chicago','IL','10193','1990-03-12','Intern');
+insert into soa.EMPLOYEES values ('E1001','Varsha','Ravikumar','varsha@gmail.com','2010','312-536-2010','312-536-2010','Driver','521521251','2015-05-12',10000.0,'125486523','2901 South King Drive','2901 South King Drive','Chicago','IL','60161','1990-05-12','Very good driver');
+insert into soa.EMPLOYEES values ('E1002','Naresh','Ravikumar','Naresh@gmail.com','2010','312-245-2011','312-245-2011','Employee','510521251','2015-05-12',10000.0,'HND5245225','2951 South King Drive','apt 202','Chicago','IL','60161','1988-06-12','Very good');
+insert into soa.EMPLOYEES values ('E1003','Thrishna','Kumar','Thrishna@gmail.com','2250','312-245-1235','312-245-1235','Employee','810533351','2015-05-12',10000.0,'HND533325225','3001 South King Drive','apt 256','Chicago','IL','60161','1990-11-23','Very good driver');
+
+insert into soa.PRICING values ('PC101',50.23,'L101','L102','312','248','CHICAGO','Michigan','C101');
+insert into soa.PRICING values ('PC102',522.23,'L101','L102','312','248','CHICAGO','Michigan','C102');
+insert into soa.PRICING values ('PC103',103.23,'L103','L101','312','312','CHICAGO','CHICAGO','C103');
+
+insert into soa.TRUCKS values ('T101','ISUZU','2005','IJ101','c232232256','E1001','Red','1KLIJH125846LOH52');
+insert into soa.TRUCKS values ('T102','FORD','2015','IJ101','SVN02524il','E1002','Purple','1KLI12565846LOH52');
+insert into soa.TRUCKS values ('T103','Chrysler','2016','CH45','G32232','E1003','Red','1K256H125846LOH52');
+
+
+insert into soa.EXPENSES values ('E101','E1001','Licenses','IDRenew',45.03,'Renewed the ID','2017-12-23','2017-12-23',0.0,'CreditCard');
+insert into soa.EXPENSES values ('E102','E1002','Employee','Salary',1000.0,'Salary for Employee','2017-02-25','2017-02-23',500.0,'Check');
+insert into soa.EXPENSES values ('E103','E1003','Office Bills','Bill Payment',40003.0,'Bill','2017-07-03','2017-07-05',0.0,'CreditCard');
+
+insert into soa.ORDERS values ('O101','2017-10-23','C101','E1001','T101',1,125485,25000.05);
+insert into soa.ORDERS values ('O102','2017-10-23','C102','E1002','T102',1,154654,25205.05);
+insert into soa.ORDERS values ('O103','2017-10-23','C103','E1002','T103',0,258425,25000.05);
+insert into soa.ORDERS values ('O110','2017-10-25','C101','E1001','T101',1,125235,25362.0);
+
+insert into soa.TRANSACTIONS values ('TR101','O101','PC101','2017-10-25','1',1005.89,'FD03','2012','FORD','E1001','T101',20.0,7,23.0,10.0,'12552HJYG5287HYTS',12,1,23.0,24.0);
+insert into soa.TRANSACTIONS values ('TR102','O101','PC102','2017-10-25','2',4505.89,'FD033','2017','Mustang','E1002','T102',20.0,7,23.0,10.0,'12552HGHT5287HYTS',12,1,23.0,24.0);
+
+insert into soa.PAYMENTS values ('P101','O101','1',25000.25,'2017-10-20','125455235','VISA','1021-2012-5555-2254','Varsha','21-22',252);
+insert into soa.PAYMENTS values ('P102','O102','2',25020.25,'2017-10-20','125455235','VISA','1021-2012-5555-2254','Varsha','21-22',252);
+insert into soa.PAYMENTS values ('P103','O103','2',25000.25,'2017-10-20','125455235','VISA','1021-2542-5555-2254','Naresh','21-20',258);
+
+insert into soa.INVOICE values ('I101','O101','E1001','C101','To be sent to loc 1',25000.25,2);
+insert into soa.INVOICE values ('I102','O102','E1002','C102','To be sent to loc 2',25020.25,4);
+insert into soa.INVOICE values ('I103','O103','E1003','C103','To be sent to loc 3',25000.25,2);
+
+INSERT INTO soa.comments (CommentID,CustomerID,LocationID,TransactionID,CommentTime,CommentLine) VALUES ('CM01','C101','L101','TR101','2002-02-10 00:00:00','Good Customer');
+INSERT INTO soa.comments (CommentID,CustomerID,LocationID,TransactionID,CommentTime,CommentLine) VALUES ('CM02','C102','L102','TR102','2002-02-10 00:00:00','Good Customer');
+INSERT INTO soa.comments (CommentID,CustomerID,LocationID,TransactionID,CommentTime,CommentLine) VALUES ('CM03','C103','L103','TR102','2002-02-10 00:00:00','Good Customer');
