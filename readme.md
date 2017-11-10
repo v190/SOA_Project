@@ -21,7 +21,7 @@ PROCEDURE - STEPS TO IMPORT JAVA PROJECT
 - Download the project zip folder and Unzip it
 - Create a web application project
 - Import the project folder in netbeans
-- Right click clean & right click build, start the glassfish server and then right click to deploy
+- Right click clean & build, start the glassfish server and then right click to deploy
 - In the output window of Glassfish server - you can view the message as 'Project deployed successfully'
 - In the project folder - you should be able to see the folder webservices; Under webservices you can see the folder truck catalogue and inside that you can see all the webservices.
 - Right click on the Truck Catalogue and click on test service --> to test the web services
@@ -33,7 +33,10 @@ PROCEDURE - STEPS TO IMPORT JAVA PROJECT
 PROCEDURE - STEPS TO SETUP THE CLIENT
 --------------------------------------
 
-- Create the ASP.Net empty web application project
+- Open the Asp.net folder provided -> Unzip the TruckWebApp file
+- In Visual Studio, On the File menu, point to Open, and then click Project/Solution -> The Open Project dialog box is displayed
+- Click Add to Solution 
+- Go to the folder that contains the solution file for the solution you want to open. Solution files have the extension .sln. Select this file and then click Open.
 - Right click on the reference and click Add service reference --> paste the wsdl in the address bar and click on GO
 - It will show you all the webservices - OK
 - Under the connected services - you can find TruckWebService (which is part of object part creation)
