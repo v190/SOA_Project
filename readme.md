@@ -1,9 +1,9 @@
 PRE-REQUISITES
 -----------------
-- netbeans IDE 8.2
-- visual studio 2015
+- Netbeans IDE 8.2
+- Visual studio 2017
 - Glass fish server 4.1.1
-- mysql
+- Mysql
 
 # Please install above software if not available in desktop
 
